@@ -6,7 +6,7 @@ import swordButton from '../../assets/images/sword.png';
 import arrowButton from '../../assets/images/arrow_button.png';
 import arrowButtonFlipped from '../../assets/images/arrow_button_flipped.png';
 import switchSidesButton from '../../assets/images/change2.png';
-import placeholderImage from '../../assets/images/Units/placeholder.png';
+import placeholderImage from '../../assets/images/placeholder.png';
 
 interface ControlSectionProps {
   isSwitchingSides: boolean;

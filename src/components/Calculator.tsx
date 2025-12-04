@@ -7,7 +7,7 @@ import HeroSection from './HeroSection/HeroSection';
 import ControlSection from './ControlSection/ControlSection';
 import styles from './Calculator.module.css';
 import type { UnitState, HeroState } from '../types/units';
-import placeholderImage from '../assets/images/Units/placeholder.png';
+import placeholderImage from '../assets/images/placeholder.png';
 
 // Интерфейс для модификаторов урона (коэффициентов)
 interface DamageModifiers {
