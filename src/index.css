@@ -1,0 +1,88 @@
+@font-face {
+    font-family: "Monotype Corsiva";
+    src: url("fonts/Monotype-Corsiva-Bold-Italic.woff2") format("woff2"),
+         url("fonts/Monotype-Corsiva-Bold-Italic.ttf") format("truetype");
+}
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center; 
+}
+
+.inputContainer input[type="number"]::-webkit-inner-spin-button,
+.inputContainer input[type="number"]::-webkit-outer-spin-button {
+    display: none;
+    margin: 0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Monotype Corsiva';
+  background-color: var(--color-bg-dark);
+  color: var(--color-text);
+}
+
+/* Сброс стилей для ссылок */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Стили для скролла */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-light);
+}
+
+:root {
+  /* Основные цвета */
+  --color-bg-dark: #0a0a0f;
+  --color-bg-header: #1a1a2e;
+  --color-primary: #16213e;
+  --color-accent: #0f3460;
+  --color-gold: #F1BF11;
+  --color-gold-light: #daa520;
+  --color-text: #e8e6e3;
+  --color-text-muted: #a0a0a0;
+  
+  /* Цвета для баннера */
+  --color-button-bg: #0a0a0f; /* Красный как в HoMM 5 */
+  --color-button-hover: #daa520d6;
+  --color-button-glow: rgba(139, 0, 0, 0.5);
+  --color-text-stroke: #000000; /* Цвет обводки текста */
+  
+  /* Шрифты */
+    font-size: clamp(10px, 1vw, 16px);
+  --font-primary: 'Monotype Corsiva', 'Times New Roman', serif;
+  --font-accent: 'Monotype Corsiva', 'Times New Roman', serif;
+  
+  /* Отступы */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  
+  /* Тени и эффекты */
+  --shadow-glow: 0 0 10px rgba(218, 165, 32, 0.3);
+  --shadow-dark: 0 4px 6px rgba(0, 0, 0, 0.7);
+  --shadow-text: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}

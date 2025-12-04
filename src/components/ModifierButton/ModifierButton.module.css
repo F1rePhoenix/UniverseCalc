@@ -1,0 +1,205 @@
+/* src/components/ModifierButton/ModifierButton.module.css */
+.modifier {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    width: 31%;
+    max-height: 100%;
+    background: #322A21;
+    border: 1px solid #8D6035;
+    border-radius: 5px;
+    cursor: pointer;
+    background-size: 95%;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.3s ease, border 0.1s ease, box-shadow 0.1s ease;
+    padding: 0;
+    margin: 0;
+    font-size: 0;
+    overflow: visible;
+}
+
+.modifier::after {
+    font-family: "Monotype Corsiva";
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 103%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #322A21;
+    color: #C5BEA1;
+    padding: 4% 8%;
+    border: 1px solid #8D6035;
+    border-radius: 3px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+    min-width: max-content;
+}
+
+.modifier:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modifier:hover {
+    transform: scale(1.1);
+}
+
+.modifier.active {
+    border: 2px solid #F3A316;
+}
+
+.modifier.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modifier.disabled:hover {
+    transform: none;
+}
+
+/* Стили для иконок модификаторов */
+.basic-offense {
+    background-image: url('../../assets/images/basicOffense.png');
+}
+
+.advanced-offense {
+    background-image: url('../../assets/images/advancedOffense.png');
+}
+
+.expert-offense {
+    background-image: url('../../assets/images/expertOffense.png');
+}
+
+.basic-defense {
+    background-image: url('../../assets/images/basicDefense.png');
+}
+
+.advanced-defense {
+    background-image: url('../../assets/images/advancedDefense.png');
+}
+
+.expert-defense {
+    background-image: url('../../assets/images/expertDefense.png');
+}
+
+.frenzy {
+    background-image: url('../../assets/images/frenzy.png');
+}
+
+.shooting {
+    background-image: url('../../assets/images/archery.png');
+}
+
+.retribution {
+    background-image: url('../../assets/images/retribution.png');
+}
+
+.vitality {
+    background-image: url('../../assets/images/vitality.png');
+}
+
+.evasion {
+    background-image: url('../../assets/images/evasion.png');
+}
+
+.defense {
+    background-image: url('../../assets/images/defense.png');
+}
+
+.hold-ground {
+    background-image: url('../../assets/images/holdGround.png');
+}
+
+.forest-rage {
+    background-image: url('../../assets/images/forestRage.png');
+}
+
+.fog-veil {
+    background-image: url('../../assets/images/fogVeil.png');
+}
+
+.range-penalty {
+    background-image: url('../../assets/images/straight_arrow.png');
+}
+
+.range-penalty.active {
+    background-image: url('../../assets/images/broken_arrow.png');
+}
+
+.home-road {
+    background-image: url('../../assets/images/roadHome.png');
+}
+
+.bloody-claw {
+    background-image: url('../../assets/images/bloodyClaw.png');
+}
+
+.ring-of-life1 {
+    background-image: url('../../assets/images/RingofLife.png');
+}
+
+.ring-of-life2 {
+    background-image: url('../../assets/images/RingofLife.png');
+}
+
+.big-shield {
+    background-image: url('../../assets/images/bigShield.png');
+}
+
+.forest-rage-ent {
+    background-image: url('../../assets/images/ability.png');
+}
+
+.blow-heaven {
+    background-image: url('../../assets/images/ability.png');
+}
+
+.curved-fire {
+    background-image: url('../../assets/images/ability.png');
+}
+
+.defensive-position {
+    background-image: url('../../assets/images/ability.png');
+}
+
+/* Для скрытых/placeholder кнопок */
+.placeholder {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Для кнопок в состоянии загрузки или временно недоступных */
+.loading {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* Анимация при переключении */
+.modifier.transitioning {
+    transition: all 0.3s ease;
+}
+
+/* Медиа-запросы для адаптивности (опционально) */
+@media (max-width: 768px) {
+    .modifier::after {
+        font-size: 12px;
+        padding: 3% 6%;
+    }
+}
+
+@media (max-width: 480px) {
+    .modifier {
+        width: 28px;
+        height: 28px;
+    }
+
+    .modifier::after {
+        font-size: 10px;
+        padding: 2% 4%;
+    }
+}

@@ -1,0 +1,54 @@
+@font-face {
+    font-family: "Corsiva";
+    src: url("fonts/Monotype-Corsiva-Bold-Italic.woff2") format("woff2"),
+         url("fonts/Monotype-Corsiva-Bold-Italic.ttf") format("truetype");
+}
+.calculator {
+    width: 100%;
+    margin-top: 12vh;
+}
+
+.calculatorContainer {
+    width: 90%; 
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.calculatorTitle {
+    text-align: center;
+    font-size: 46px;
+    color: #F1BF11;
+    margin: 2% 0px;
+}
+
+.calculatorColumns {
+    display: flex;
+    justify-content: space-between;
+    gap: 2%;  
+}
+
+.calculatorColumn {
+    display: flex;
+    flex-direction: column;
+}
+
+.calculatorColumn:nth-child(1),
+.calculatorColumn:nth-child(3) {
+    flex: 3; 
+}
+
+.calculatorColumn:nth-child(2) {
+    flex: 2; 
+}
+
+/* Адаптивные стили */
+@media (max-width: 767px) {
+    .calculatorColumns {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .calculatorColumn {
+        width: 100%;
+    }
+}

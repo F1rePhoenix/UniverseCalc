@@ -1,0 +1,69 @@
+/* HeroSection.module.css */
+.heroSection {
+    background-color: #493D32;
+    border: 3px solid #8D6035;
+    border-radius: 5px;
+    padding: 0 0.4%;
+    height: auto;
+}
+
+.heroSection h2 {
+    font-size: 36px;
+    text-align: center;
+    color: #F1BF11;
+    padding: 2%;
+    margin: 0;
+}
+
+.heroInputRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 2%;
+    padding: 0 1%;
+    margin-bottom: 0%;
+}
+
+.heroInputContainer {
+    display: flex;
+    justify-content: space-between;
+    gap: 4%;
+    padding: 0 3%;
+    margin-bottom: 2%;
+}
+
+.heroLabel {
+    color: #F1BF11;
+    font-size: 30px;
+    text-align: center;
+    width: 30%;
+}
+
+.heroInput {
+    text-align: center;
+    font-family: "Corsiva";
+    padding: 1%;
+    font-size: 20px;
+    background: #322A21;
+    color: #C5BEA1;
+    border: 1px solid #8D6035;
+    border-radius: 7px;
+    width: 25%;
+    transition: border-width 0.2s ease-in-out;
+}
+
+.heroInput:focus {
+    outline: none;
+    border: 1px solid #F3A316;
+    box-shadow: 0 0 0 1px #F3A316;
+}
+
+.heroInput::placeholder {
+    color: #C5BEA1;
+    text-align: center;
+}
+
+.heroInput[type="number"]::-webkit-inner-spin-button, 
+.heroInput[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

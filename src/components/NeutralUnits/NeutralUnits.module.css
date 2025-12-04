@@ -1,0 +1,201 @@
+/* Убираем стрелочки у полей ввода */
+.inputContainer input[type="number"]::-webkit-inner-spin-button,
+.inputContainer input[type="number"]::-webkit-outer-spin-button {
+    display: none;
+    margin: 0;
+}
+
+.neutralUnitsSection {
+  background-color: #493D32;
+  border: 3px solid #8D6035;
+  border-radius: 5px;
+  padding: 0 0.4%;
+  height: auto;
+}
+
+.neutralUnitsSection h2 {
+  font-size: 36px;
+  text-align: center;
+  color: #F1BF11;
+  padding: 2%;
+  margin: 0;
+}
+
+.selectRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1%;
+  gap: 2%;
+  margin-bottom: 5%;
+}
+
+.factionSelect,
+.tierSelect,
+.unitSelect {
+  background-color: #322A21;
+  color: #C5BEA1;
+  font-family: "Monotype Corsiva";
+  border: 1px solid #8D6035;
+  border-radius: 5px;
+  padding: 5px 5px;
+  font-size: 20px;
+  width: 100%;
+  appearance: none;
+  outline: none;
+  background-image: url('../../assets/images/arrow.png');
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  padding-right: 35px;
+  background-size: 26px 26px;
+}
+
+.factionSelect:focus,
+.tierSelect:focus,
+.unitSelect:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px #8D6035;
+}
+
+.factionSelect,
+.unitSelect {
+  width: 40%;
+}
+
+.tierSelect {
+  width: 25%;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 3%;
+}
+
+.inputRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 2%;
+  padding: 0 1%;
+  margin-bottom: 3%;
+}
+
+.labelColumn {
+  color: #F1BF11;
+  font-size: 30px;
+  text-align: center;
+  width: 30%;
+}
+
+.inputColumn {
+  width: 30%;
+  display: flex;
+  justify-content: space-between;
+  gap: 4%;
+}
+
+.inputColumn input {
+  text-align: center;
+  font-family: "Monotype Corsiva";
+  padding: 1%;
+  font-size: 20px;
+  background: #322A21;
+  color: #C5BEA1;
+  border: 1px solid #8D6035;
+  border-radius: 7px;
+  width: 100%;
+  transition: border-width 0.2s ease-in-out;
+}
+
+.inputColumn input:focus {
+  outline: none;
+  border: 1px solid #F3A316;
+  box-shadow: 0 0 0 1px #F3A316;
+}
+
+.inputColumn input::placeholder {
+  color: #C5BEA1;
+  text-align: center;
+}
+
+/* Для нейтральных юнитов - только одна колонка модификаторов */
+.modifiersColumn {
+  display: flex;
+  justify-content: space-between;
+  gap: 2%;
+  width: 30%;
+}
+
+.modifier {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  width: 31%;
+  max-height: 100%;
+  background: #322A21;
+  border: 1px solid #8D6035;
+  border-radius: 5px;
+  cursor: pointer;
+  background-size: 95%;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: transform 0.3s ease, border 0.1s ease, box-shadow 0.1s ease;
+}
+
+.modifier::after {
+  font-family: "Monotype Corsiva";
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 103%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #322A21;
+  color: #C5BEA1;
+  padding: 4% 8%;
+  border: 1px solid #8D6035;
+  border-radius: 3px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  pointer-events: none;
+}
+
+.modifier:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modifier:hover {
+  transform: scale(1.1);
+}
+
+.modifier.active {
+  border: 2px solid #F3A316;
+}
+
+/* Стили для скрытых модификаторов */
+.modifier[style*="visibility: hidden"] {
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Специфичные стили для нейтральных юнитов - пустые строки */
+.emptyModifiersColumn {
+  display: flex;
+  justify-content: space-between;
+  gap: 2%;
+  width: 30%;
+}
+
+.emptyModifier {
+  aspect-ratio: 1 / 1;
+  width: 31%;
+  visibility: hidden;
+}
+
+/* Стили для иконок модификаторов нейтральных юнитов */
+.range-penalty { background-image: url('../../assets/images/straight_arrow.png'); }
+.range-penalty.active { background-image: url('../../assets/images/broken_arrow.png'); }
+.home-road { background-image: url('../../assets/images/roadHome.png'); }
+.big-shield { background-image: url('../../assets/images/bigShield.png'); }
+.unit-ability { background-image: url('../../assets/images/ability.png'); }
