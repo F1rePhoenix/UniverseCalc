@@ -26,7 +26,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       <div className={styles.heroInputRow}>
         <div className={styles.heroLabel}>{language === 'ru' ? 'Нап' : 'Att'}</div>
         <div className={styles.heroLabel}>{language === 'ru' ? 'Защ' : 'Def'}</div>
-        <div className={styles.heroLabel}>БД</div>
+        <div className={styles.heroLabel}>
+          {language === 'ru' ? 'БД' : 'Mor'}
+        </div>
       </div>
       
       <div className={styles.heroInputContainer}>
@@ -50,7 +52,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           type="number"
           value={heroState.FS || ''}
           onChange={(e) => handleInputChange('FS', e.target.value)}
-          placeholder="БД"
+          placeholder={language === 'ru' ? 'БД' : 'Mor'}
           min="0"
           className={styles.heroInput}
         />

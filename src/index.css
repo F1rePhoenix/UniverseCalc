@@ -1,8 +1,12 @@
+
 @font-face {
-    font-family: "Monotype Corsiva";
-    src: url("fonts/Monotype-Corsiva-Bold-Italic.woff2") format("woff2"),
-         url("fonts/Monotype-Corsiva-Bold-Italic.ttf") format("truetype");
+  font-family: 'Monotype Corsiva';
+  src: url('./assets/fonts/Monotype-Corsiva-Bold-Italic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
 }
+
 #root {
   width: 100%;
   margin: 0;

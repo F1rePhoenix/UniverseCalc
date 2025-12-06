@@ -1,32 +1,17 @@
 // src/components/NeutralUnits/NeutralUnits.tsx
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect,useState } from 'react';
 import { units } from '../../data/unitsData';
+import type { UnitState, ModifierKey } from '../../types/units';
+import { 
+  getAbilityTooltip,
+  getAbilityIdFromUnitData,
+  getFactionTranslation,
+  getRangePenaltyTooltip,
+  applyUnitSpecificModifiers,
+  getBaseStats
+} from '../../utils/modifiers';
+import ModifierButton from '../ModifierButton/ModifierButton';
 import styles from './NeutralUnits.module.css';
-
-interface Unit {
-  name: string;
-  nameEn: string;
-  attack: number;
-  defense: number;
-  damage: string;
-  health: number;
-  image: string;
-  unitData: number;
-}
-
-interface UnitState {
-  faction: string;
-  tier: string;
-  unit: Unit | null;
-  quantity: number;
-  attack: number;
-  defense: number;
-  minDamage: number;
-  maxDamage: number;
-  health: number;
-  modifiers: string[];
-  hiddenModifiers: { [key: string]: number };
-}
 
 interface NeutralUnitsProps {
   unitState: UnitState;
@@ -34,53 +19,85 @@ interface NeutralUnitsProps {
   language: 'ru' | 'en';
 }
 
-const factionTranslations = {
-  ru: {
-    "Орден порядка": "Орден порядка",
-    "Инферно": "Инферно", 
-    "Некрополис": "Некрополис",
-    "Лесной союз": "Лесной союз",
-    "Лига теней": "Лига теней",
-    "Академия волшебства": "Академия волшебства",
-    "Подгорный народ": "Подгорный народ",
-    "Великая орда": "Великая орда",
-    "Нейтральные существа": "Нейтральные существа"
-  },
-  en: {
-    "Орден порядка": "Order of Order",
-    "Инферно": "Inferno",
-    "Некрополис": "Necropolis",
-    "Лесной союз": "Forest Alliance", 
-    "Лига теней": "Shadow League",
-    "Академия волшебства": "Magic Academy",
-    "Подгорный народ": "Underground People",
-    "Великая орда": "Great Horde",
-    "Нейтральные существа": "Neutral Creatures"
+const neutralAvailableModifiers: ModifierKey[] = [
+  'range-penalty',
+  'home-road', 
+  'big-shield',
+  'forest-rage-ent',
+  'blow-heaven',
+  'curved-fire',
+  'defensive-position'
+];
+
+const neutralPreservedModifiers: ModifierKey[] = ['home-road'];
+
+// Функция пересчета всех характеристик с нуля
+const recalculateStats = (
+  unit: any,
+  modifiers: string[],
+  currentQuantity: number,
+  currentHiddenModifiers: { [key: string]: number } = {}
+): UnitState => {
+  if (!unit) {
+    return {
+      faction: '',
+      tier: '',
+      unit: null,
+      quantity: currentQuantity || 1,
+      attack: 0,
+      defense: 0,
+      minDamage: 0,
+      maxDamage: 0,
+      health: 0,
+      modifiers,
+      hiddenModifiers: currentHiddenModifiers
+    };
   }
-};
 
-// Define type for modifier function return values
-type StatChanges = Partial<Pick<UnitState, 'attack' | 'defense' | 'minDamage' | 'maxDamage' | 'health'>>;
-
-// Define valid modifier keys for neutral units
-type NeutralModifierKey = 
-  | 'home-road'
-  | 'forest-rage-ent'
-  | 'defensive-position';
-
-// Функция для получения текста подсказки способности
-const getAbilityTooltip = (unitData: number | undefined, language: 'ru' | 'en'): string => {
-  if (!unitData) return '';
+  // Базовые характеристики
+  const [minDmg, maxDmg] = unit.damage.split('-').map(Number);
+  const baseStats = getBaseStats(unit);
   
-  const abilities = {
-    10: { ru: 'Ярость леса', en: 'Forest Rage' },
-    11: { ru: 'Удар с небес', en: 'Heaven Strike' },
-    12: { ru: 'Стрельба навесом', en: 'Curved Fire' },
-    13: { ru: 'Оборонительная позиция', en: 'Defensive Position' }
-  };
+  let attack = baseStats.attack;
+  let defense = baseStats.defense;
+  let minDamage = minDmg;
+  let maxDamage = maxDmg;
+  let health = baseStats.health;
+  let hiddenModifiers = { ...currentHiddenModifiers };
 
-  const ability = abilities[unitData as keyof typeof abilities];
-  return ability ? ability[language] : '';
+  // Применяем модификаторы по очереди
+  modifiers.forEach(modifier => {
+    switch (modifier) {
+      case 'home-road':
+        attack += 1;
+        defense += 1;
+        break;
+      case 'forest-rage-ent':
+        const transferredDefense = Math.floor(defense / 2);
+        attack += transferredDefense;
+        defense -= transferredDefense;
+        break;
+      case 'defensive-position':
+        defense += 7;
+        break;
+      // Остальные модификаторы не меняют базовые характеристики
+      // Они влияют только на расчет урона в Calculator.tsx
+    }
+  });
+
+  return {
+    faction: '',
+    tier: '',
+    unit,
+    quantity: currentQuantity || 1,
+    attack,
+    defense,
+    minDamage,
+    maxDamage,
+    health,
+    modifiers,
+    hiddenModifiers
+  };
 };
 
 const NeutralUnits: React.FC<NeutralUnitsProps> = ({ 
@@ -89,109 +106,45 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
   language 
 }) => {
   const [availableTiers, setAvailableTiers] = useState<string[]>([]);
-  const [availableUnits, setAvailableUnits] = useState<Unit[]>([]);
+  const [availableUnits, setAvailableUnits] = useState<any[]>([]);
   const [hasUnitAbility, setHasUnitAbility] = useState(false);
-  const [unitAbilityId, setUnitAbilityId] = useState<string>('');
+  const [unitAbilityId, setUnitAbilityId] = useState<ModifierKey | ''>('');
 
-  // Modifier functions for neutral units
-  const applyHomeRoadModifier = useCallback((isActive: boolean, currentState: UnitState): StatChanges => {
-    return {
-      attack: isActive ? currentState.attack + 1 : currentState.attack - 1,
-      defense: isActive ? currentState.defense + 1 : currentState.defense - 1
-    };
-  }, []);
-
-  // Функции для уникальных способностей нейтральных юнитов
-  const applyForestRageEntModifier = useCallback((isActive: boolean, currentState: UnitState): StatChanges => {
-    const baseAttack = currentState.attack;
-    const baseDefense = currentState.defense;
-    const transferredDefense = Math.floor(baseDefense / 2);
-    
-    if (isActive) {
-      return {
-        attack: baseAttack + transferredDefense,
-        defense: baseDefense - transferredDefense
-      };
-    } else {
-      return {
-        attack: baseAttack,
-        defense: baseDefense
-      };
-    }
-  }, []);
-
-  const applyDefensivePositionModifier = useCallback((isActive: boolean, currentState: UnitState): StatChanges => {
-    return {
-      defense: isActive ? currentState.defense + 7 : currentState.defense - 7
-    };
-  }, []);
-
-  const modifierFunctions = useMemo((): Record<NeutralModifierKey, (isActive: boolean, state: UnitState) => StatChanges> => ({
-    'home-road': applyHomeRoadModifier,
-    'forest-rage-ent': applyForestRageEntModifier,
-    'defensive-position': applyDefensivePositionModifier
-  }), [
-    applyHomeRoadModifier,
-    applyForestRageEntModifier,
-    applyDefensivePositionModifier
-  ]);
-
-  // Функция применения нескольких модификаторов
-  const applyMultipleModifiers = useCallback((modifiers: string[], state: UnitState): UnitState => {
-    let newState = { ...state };
-    
-    modifiers.forEach(modifier => {
-      if (modifier in modifierFunctions) {
-        const modifierFunction = modifierFunctions[modifier as NeutralModifierKey];
-        const isActive = newState.modifiers.includes(modifier);
-        const changes = modifierFunction(isActive, newState);
-        newState = { ...newState, ...changes };
-      }
-    });
-    
-    return newState;
-  }, [modifierFunctions]);
-
+  // Обработчик переключения модификатора с пересчетом
   const handleModifierToggle = useCallback((modifierId: string) => {
-    const isActive = unitState.modifiers.includes(modifierId);
-    let newModifiers: string[];
+    if (!neutralAvailableModifiers.includes(modifierId as ModifierKey)) return;
     
-    newModifiers = isActive 
+    const isActive = unitState.modifiers.includes(modifierId);
+    const newModifiers = isActive 
       ? unitState.modifiers.filter(m => m !== modifierId)
       : [...unitState.modifiers, modifierId];
-
-    // Получаем текущее состояние с базовыми характеристиками
-    let newState: UnitState = { ...unitState, modifiers: newModifiers };
     
-    // Если выключили модификатор, который влиял на характеристики, нужно восстановить базовые значения
-    if (isActive && modifierId in modifierFunctions) {
-      const modifierFunction = modifierFunctions[modifierId as NeutralModifierKey];
-      const changes = modifierFunction(false, newState);
-      newState = { ...newState, ...changes };
-    } 
-    // Если включили модификатор, который влияет на характеристики
-    else if (!isActive && modifierId in modifierFunctions) {
-      const modifierFunction = modifierFunctions[modifierId as NeutralModifierKey];
-      const changes = modifierFunction(true, newState);
-      newState = { ...newState, ...changes };
-    }
-
+    // Пересчитываем все характеристики с нуля
+    const recalculatedState = recalculateStats(
+      unitState.unit,
+      newModifiers,
+      unitState.quantity,
+      unitState.hiddenModifiers
+    );
+    
     onUnitChange({
       modifiers: newModifiers,
-      attack: newState.attack,
-      defense: newState.defense,
-      minDamage: newState.minDamage,
-      maxDamage: newState.maxDamage,
-      health: newState.health
+      attack: recalculatedState.attack,
+      defense: recalculatedState.defense,
+      minDamage: recalculatedState.minDamage,
+      maxDamage: recalculatedState.maxDamage,
+      health: recalculatedState.health,
+      hiddenModifiers: recalculatedState.hiddenModifiers
     });
-  }, [unitState, onUnitChange, modifierFunctions]);
+  }, [unitState, onUnitChange]);
 
+  // Обработчик смены фракции
   const handleFactionChange = useCallback((faction: string) => {
     const newTiers = faction === "Нейтральные существа" ? ["-"] : Object.keys(units[faction] || {});
     
-    // Сохраняем текущие модификаторы при смене фракции
+    // Сохраняем только разрешенные модификаторы
     const preservedModifiers = unitState.modifiers.filter(mod => 
-      ['home-road'].includes(mod)
+      neutralPreservedModifiers.includes(mod as ModifierKey)
     );
     
     onUnitChange({
@@ -214,12 +167,13 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
     setUnitAbilityId('');
   }, [onUnitChange, unitState.modifiers]);
 
+  // Обработчик смены тира
   const handleTierChange = useCallback((tier: string) => {
     const factionUnits = units[unitState.faction]?.[tier] || [];
     
-    // Сохраняем текущие модификаторы при смене тира
+    // Сохраняем только разрешенные модификаторы
     const preservedModifiers = unitState.modifiers.filter(mod => 
-      ['home-road'].includes(mod)
+      neutralPreservedModifiers.includes(mod as ModifierKey)
     );
     
     onUnitChange({
@@ -240,161 +194,59 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
     setUnitAbilityId('');
   }, [unitState.faction, unitState.modifiers, onUnitChange]);
 
-  const applyUnitDataModifiers = useCallback((unitData: number, state: Partial<UnitState>) => {
-    const modifiers = [...(state.modifiers || [])];
-    const hiddenModifiers = { ...(state.hiddenModifiers || {}) };
-
-    // Сбрасываем скрытые модификаторы
-    Object.keys(hiddenModifiers).forEach(key => {
-      if (key === 'pitLord' || key === 'pitSpawn') {
-        hiddenModifiers[key] = 0;
-      } else {
-        hiddenModifiers[key] = 1;
-      }
-    });
-
-    // Сохраняем текущие модификаторы, кроме уникальных способностей и специфичных для юнита
-    const preservedModifiers = modifiers.filter(mod => 
-      !['forest-rage-ent', 'blow-heaven', 'curved-fire', 'defensive-position', 
-        'range-penalty', 'big-shield'].includes(mod)
-    );
-
-    
-    const newModifiers = [...preservedModifiers];
-
-    // Устанавливаем скрытые модификаторы и модификаторы в зависимости от unitData
-    switch (unitData) {
-      case 1: // Стрелок
-        newModifiers.push('range-penalty');
-        hiddenModifiers.meleePenalty = 0.5;
-        break;
-      case 2: // Стрелок без штрафа к стрельбе
-        hiddenModifiers.meleePenalty = 0.5;
-        break;
-      case 3: // Стрелок без штрафа в ближнем бою
-        newModifiers.push('range-penalty');
-        break;
-      case 4: // Стрелок с дополнительным штрафом
-        newModifiers.push('range-penalty');
-        hiddenModifiers.rangePenalty2 = 0.5;
-        break;
-      case 5: // Эльфийские лучники
-        newModifiers.push('range-penalty');
-        hiddenModifiers.doubleShoot = 2;
-        hiddenModifiers.meleePenalty = 0.5;
-        break;
-      case 6: // Пещерные владыки
-        hiddenModifiers.pitLord = 1;
-        break;
-      case 7: // Пещерные отродья
-        hiddenModifiers.pitSpawn = 2;
-        break;
-      case 8: // Лесные стрелки
-        hiddenModifiers.meleePenalty = 0.5;
-        hiddenModifiers.powerArrow = 0.667;
-        break;
-      case 9: // Таны и эрлы
-        hiddenModifiers.blowStorm = 2;
-        break;
-      case 10: // Дикие энты - Ярость леса
-        // Не добавляем автоматически, только показываем кнопку
-        break;
-      case 11: // Грифоны - Удар с небес
-        // Не добавляем автоматически, только показываем кнопку
-        break;
-      case 12: // Лучники - Стрельба навесом
-        newModifiers.push('range-penalty');
-        hiddenModifiers.meleePenalty = 0.5;
-        // Не добавляем curved-fire автоматически
-        break;
-      case 13: // Горные стражи - Оборонительная позиция
-        newModifiers.push('big-shield');
-        // Не добавляем defensive-position автоматически
-        break;
-      case 14: // Большой щит
-        newModifiers.push('big-shield');
-        break;
-      case 15: // Циклопы
-        newModifiers.push('range-penalty');
-        hiddenModifiers.rangePenalty2 = 0.5;
-        break;
-    }
-
-    state.modifiers = newModifiers;
-    state.hiddenModifiers = hiddenModifiers;
-    
-    // Определяем, есть ли уникальная способность
-    const abilityId = getAbilityIdFromUnitData(unitData);
-    setHasUnitAbility(!!abilityId);
-    setUnitAbilityId(abilityId || '');
-  }, []);
-
-  // Вспомогательная функция для определения ID способности по unitData
-  const getAbilityIdFromUnitData = useCallback((unitData: number): string => {
-    switch (unitData) {
-      case 10: return 'forest-rage-ent';
-      case 11: return 'blow-heaven';
-      case 12: return 'curved-fire';
-      case 13: return 'defensive-position';
-      default: return '';
-    }
-  }, []);
-
+  // Обработчик смены юнита
   const handleUnitChange = useCallback((unitIndex: number) => {
     const selectedUnit = availableUnits[unitIndex];
     if (!selectedUnit) return;
 
-    const [minDmg, maxDmg] = selectedUnit.damage.split('-').map(Number);
-    const baseAttack = selectedUnit.attack;
-    const baseDefense = selectedUnit.defense;
-    const baseHealth = selectedUnit.health;
-
-    // Начинаем с базовых характеристик
-    const newUnitState: Partial<UnitState> = {
-      unit: selectedUnit,
-      attack: baseAttack,
-      defense: baseDefense,
-      minDamage: minDmg,
-      maxDamage: maxDmg,
-      health: baseHealth,
-      quantity: unitState.quantity || 1,
-      modifiers: [],
-      hiddenModifiers: {}
-    };
 
     // Применяем специфичные для юнита модификаторы
-    applyUnitDataModifiers(selectedUnit.unitData, newUnitState);
-
+    const unitModifiers = applyUnitSpecificModifiers(
+      selectedUnit.unitData,
+      [],
+      {}
+    );
+    
     // Сохраняем текущие модификаторы (кроме уникальных способностей и специфичных для юнита)
     const preservedModifiers = unitState.modifiers.filter(mod => 
       !['forest-rage-ent', 'blow-heaven', 'curved-fire', 'defensive-position', 
         'range-penalty', 'big-shield'].includes(mod)
     );
 
-    // Добавляем сохраненные модификаторы
-    preservedModifiers.forEach(mod => {
-      if (!newUnitState.modifiers?.includes(mod)) {
-        newUnitState.modifiers?.push(mod);
-      }
-    });
-
-    // Применяем все активные модификаторы к характеристикам
-    if (newUnitState.modifiers && newUnitState.modifiers.length > 0) {
-      const finalState = applyMultipleModifiers(newUnitState.modifiers, newUnitState as UnitState);
-      
-      onUnitChange({
-        ...newUnitState,
-        attack: finalState.attack,
-        defense: finalState.defense,
-        minDamage: finalState.minDamage,
-        maxDamage: finalState.maxDamage,
-        health: finalState.health
-      });
+    const allModifiers = [...preservedModifiers, ...unitModifiers.modifiers];
+    
+    // Определяем уникальную способность
+    const abilityId = getAbilityIdFromUnitData(selectedUnit.unitData);
+    if (abilityId) {
+      setHasUnitAbility(true);
+      setUnitAbilityId(abilityId);
     } else {
-      onUnitChange(newUnitState);
+      setHasUnitAbility(false);
+      setUnitAbilityId('');
     }
-  }, [availableUnits, unitState.quantity, unitState.modifiers, onUnitChange, applyUnitDataModifiers, applyMultipleModifiers]);
 
+    // Пересчитываем все характеристики
+    const recalculatedState = recalculateStats(
+      selectedUnit,
+      allModifiers,
+      unitState.quantity || 1,
+      unitModifiers.hiddenModifiers
+    );
+
+    onUnitChange({
+      unit: selectedUnit,
+      attack: recalculatedState.attack,
+      defense: recalculatedState.defense,
+      minDamage: recalculatedState.minDamage,
+      maxDamage: recalculatedState.maxDamage,
+      health: recalculatedState.health,
+      quantity: unitState.quantity || 1,
+      modifiers: recalculatedState.modifiers,
+      hiddenModifiers: recalculatedState.hiddenModifiers
+    });
+  }, [availableUnits, unitState.quantity, unitState.modifiers, onUnitChange]);
+
+  // Загрузка доступных тиров при изменении фракции
   useEffect(() => {
     if (unitState.faction) {
       const tiers = unitState.faction === "Нейтральные существа" 
@@ -404,6 +256,7 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
     }
   }, [unitState.faction]);
 
+  // Загрузка доступных юнитов при изменении фракции и тира
   useEffect(() => {
     if (unitState.faction && unitState.tier) {
       const factionUnits = units[unitState.faction]?.[unitState.tier] || [];
@@ -414,19 +267,51 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
   // Обновляем состояние уникальной способности при изменении юнита
   useEffect(() => {
     if (unitState.unit) {
-      applyUnitDataModifiers(unitState.unit.unitData, unitState);
+      const abilityId = getAbilityIdFromUnitData(unitState.unit.unitData);
+      setHasUnitAbility(!!abilityId);
+      setUnitAbilityId(abilityId || '');
     }
-  }, [unitState.unit, applyUnitDataModifiers]);
+  }, [unitState.unit]);
 
+  // Обработчик ввода числовых значений
   const handleInputChange = useCallback((field: keyof UnitState, value: string) => {
     const numValue = value === '' ? (field === 'health' ? 1 : 0) : Math.max(0, parseInt(value) || 0);
-    onUnitChange({ [field]: numValue });
-  }, [onUnitChange]);
+    
+    // Если меняем quantity, просто обновляем его
+    if (field === 'quantity') {
+      onUnitChange({ [field]: numValue });
+      return;
+    }
+    
+    // Для других полей пересчитываем с учетом нового значения
+    // Но сначала обновляем текущее состояние
+    const newState = { ...unitState, [field]: numValue };
+    
+    // Пересчитываем все с нуля
+    const recalculatedState = recalculateStats(
+      newState.unit,
+      newState.modifiers,
+      newState.quantity,
+      newState.hiddenModifiers
+    );
+    
+    // Обновляем только нужное поле и пересчитанные характеристики
+    onUnitChange({
+      [field]: numValue,
+      attack: recalculatedState.attack,
+      defense: recalculatedState.defense,
+      minDamage: recalculatedState.minDamage,
+      maxDamage: recalculatedState.maxDamage,
+      health: recalculatedState.health
+    });
+  }, [unitState, onUnitChange]);
 
-  const getTranslatedFaction = (faction: string) => {
-    const translation = factionTranslations[language];
-    return translation[faction as keyof typeof translation] || faction;
-  };
+  // Обработчик для уникальной способности
+  const handleUnitAbilityToggle = useCallback(() => {
+    if (unitAbilityId && neutralAvailableModifiers.includes(unitAbilityId)) {
+      handleModifierToggle(unitAbilityId);
+    }
+  }, [unitAbilityId, handleModifierToggle]);
 
   // Получаем подсказку для уникальной способности
   const getUnitAbilityTooltip = () => {
@@ -434,12 +319,60 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
     return getAbilityTooltip(unitState.unit.unitData, language);
   };
 
-  // Обработчик для уникальной способности
-  const handleUnitAbilityToggle = useCallback(() => {
-    if (unitAbilityId) {
-      handleModifierToggle(unitAbilityId);
+  // Рендер группы модификаторов для нейтральных юнитов
+  const renderNeutralModifiers = (modifierIds: ModifierKey[]) => (
+    <div className={styles.modifiersColumn}>
+      {modifierIds.map(modifierId => {
+        const tooltip = modifierId === 'range-penalty' 
+          ? getRangePenaltyTooltip(unitState.modifiers.includes('range-penalty'), language)
+          : undefined;
+        
+        return (
+          <ModifierButton
+            key={modifierId}
+            modifierId={modifierId}
+            isActive={unitState.modifiers.includes(modifierId)}
+            onClick={() => handleModifierToggle(modifierId)}
+            language={language}
+            data-tooltip={tooltip}
+          />
+        );
+      })}
+    </div>
+  );
+
+  // Рендер кнопки уникальной способности
+  const renderUnitAbilityButton = () => {
+    if (!hasUnitAbility || !unitAbilityId) {
+      return (
+        <>
+          <div className={`${styles.modifier} ${styles['unit-ability']}`} style={{ visibility: 'hidden' }} />
+          <div className={styles.modifier} style={{ visibility: 'hidden' }} />
+          <div className={styles.modifier} style={{ visibility: 'hidden' }} />
+        </>
+      );
     }
-  }, [unitAbilityId, handleModifierToggle]);
+
+    const customTooltip = getUnitAbilityTooltip();
+    
+    return (
+      <>
+        <button
+          className={`
+            ${styles.modifier}
+            ${styles['unit-ability']}
+            ${unitState.modifiers.includes(unitAbilityId) ? styles.active : ''}
+          `}
+          onClick={handleUnitAbilityToggle}
+          data-tooltip={customTooltip}
+          aria-label={customTooltip}
+          type="button"
+        />
+        <div className={styles.modifier} style={{ visibility: 'hidden' }} />
+        <div className={styles.modifier} style={{ visibility: 'hidden' }} />
+      </>
+    );
+  };
 
   return (
     <div className={styles.neutralUnitsSection}>
@@ -456,7 +389,7 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
           </option>
           {Object.keys(units).map(faction => (
             <option key={faction} value={faction}>
-              {getTranslatedFaction(faction)}
+              {getFactionTranslation(faction, language)}
             </option>
           ))}
         </select>
@@ -493,6 +426,7 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
       </div>
 
       <div className={styles.inputContainer}>
+        {/* Нападение */}
         <div className={styles.inputRow}>
           <div className={styles.labelColumn}>
             {language === 'ru' ? 'Нападение' : 'Attack'}
@@ -506,34 +440,10 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
               min="0"
             />
           </div>
-          <div className={styles.modifiersColumn}>
-            <button
-              className={`${styles.modifier} ${styles['range-penalty']} ${
-                unitState.modifiers.includes('range-penalty') ? styles.active : ''
-              }`}
-              onClick={() => handleModifierToggle('range-penalty')}
-              data-tooltip={unitState.modifiers.includes('range-penalty') 
-                ? (language === 'ru' ? 'Стрельба со штрафом' : 'Ranged with penalty')
-                : (language === 'ru' ? 'Стрельба без штрафа' : 'Ranged without penalty')
-              }
-            />
-            <button
-              className={`${styles.modifier} ${styles['home-road']} ${
-                unitState.modifiers.includes('home-road') ? styles.active : ''
-              }`}
-              onClick={() => handleModifierToggle('home-road')}
-              data-tooltip={language === 'ru' ? 'Родные земли' : 'Home Road'}
-            />
-            <button
-              className={`${styles.modifier} ${styles['big-shield']} ${
-                unitState.modifiers.includes('big-shield') ? styles.active : ''
-              }`}
-              onClick={() => handleModifierToggle('big-shield')}
-              data-tooltip={language === 'ru' ? 'Большой щит' : 'Big Shield'}
-            />
-          </div>
+          {renderNeutralModifiers(['range-penalty', 'home-road', 'big-shield'])}
         </div>
 
+        {/* Защита */}
         <div className={styles.inputRow}>
           <div className={styles.labelColumn}>
             {language === 'ru' ? 'Защита' : 'Defense'}
@@ -548,23 +458,11 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
             />
           </div>
           <div className={styles.modifiersColumn}>
-            {hasUnitAbility ? (
-              <button
-                className={`${styles.modifier} ${styles['unit-ability']} ${
-                  unitState.modifiers.includes(unitAbilityId) ? styles.active : ''
-                }`}
-                onClick={handleUnitAbilityToggle}
-                data-tooltip={getUnitAbilityTooltip()}
-                style={{ visibility: 'visible' }}
-              />
-            ) : (
-              <div className={`${styles.modifier} ${styles['unit-ability']}`} style={{ visibility: 'hidden' }} />
-            )}
-            <div className={styles.modifier} style={{ visibility: 'hidden' }} />
-            <div className={styles.modifier} style={{ visibility: 'hidden' }} />
+            {renderUnitAbilityButton()}
           </div>
         </div>
 
+        {/* Урон */}
         <div className={styles.inputRow}>
           <div className={styles.labelColumn}>
             {language === 'ru' ? 'Урон' : 'Damage'}
@@ -592,6 +490,7 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
           </div>
         </div>
 
+        {/* Здоровье */}
         <div className={styles.inputRow}>
           <div className={styles.labelColumn}>
             {language === 'ru' ? 'Здоровье' : 'Health'}
@@ -612,6 +511,7 @@ const NeutralUnits: React.FC<NeutralUnitsProps> = ({
           </div>
         </div>
 
+        {/* Количество */}
         <div className={styles.inputRow}>
           <div className={styles.labelColumn}>
             {language === 'ru' ? 'Кол-во' : 'Quantity'}

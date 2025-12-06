@@ -370,7 +370,6 @@ const Calculator: React.FC = () => {
               onHeroChange={updateHero}
               language={language}
             />
-            
             <ControlSection 
               isSwitchingSides={isSwitchingSides}
               isRangedAttack={isRangedAttack}

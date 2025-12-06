@@ -3,8 +3,6 @@ import { useLanguageContext } from '../../contexts/LanguageContext';
 import styles from './Header.module.css';
 import logo from '../../assets/images/Logo.png';
 
-console.log('СТИЛИ HEADER:', styles);
-
 interface NavItem {
   id: string;
   label: {

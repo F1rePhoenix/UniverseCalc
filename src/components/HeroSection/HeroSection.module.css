@@ -5,6 +5,7 @@
     border-radius: 5px;
     padding: 0 0.4%;
     height: auto;
+    margin-bottom: 3%;
 }
 
 .heroSection h2 {
@@ -40,7 +41,7 @@
 
 .heroInput {
     text-align: center;
-    font-family: "Corsiva";
+    font-family: "Monotype Corsiva";
     padding: 1%;
     font-size: 20px;
     background: #322A21;
