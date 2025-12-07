@@ -1,4 +1,3 @@
-// src/components/ControlSection/ControlSection.tsx
 import React, { useState, useCallback } from 'react';
 import styles from './ControlSection.module.css';
 import swordButtonFlipped from '../../assets/images/sword_flipped.png';
