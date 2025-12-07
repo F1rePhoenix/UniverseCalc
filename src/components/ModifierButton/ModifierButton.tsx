@@ -50,6 +50,8 @@ const ModifierButton: React.FC<ModifierButtonProps> = ({
       'fog-veil': { ru: 'Туманная завеса', en: 'Fog Veil' },
       'range-penalty': { ru: 'Стрельба без штрафа', en: 'Ranged without penalty' },
       'home-road': { ru: 'Родные земли', en: 'Home Road' },
+      'cold-steel': { ru: 'Холодная сталь', en: 'Cold Steel' },
+      'fiery-wrath': { ru: 'Огненная ярость', en: 'Fiery Wrath' },
       
       // Артефакты
       'bloody-claw': { ru: 'Ожерелье кровавого когтя', en: 'Bloody Claw Necklace' },

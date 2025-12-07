@@ -52,6 +52,8 @@ const Units: React.FC<UnitsProps> = ({
       'hold-ground': () => ({}),
       'range-penalty': () => ({}),
       'big-shield': () => ({}),
+      'cold-steel': () => ({}),
+      'fiery-wrath': () => ({}),
       
       // Функции, которые меняют характеристики
       'frenzy': applyFrenzyModifier,
@@ -336,11 +338,8 @@ const Units: React.FC<UnitsProps> = ({
   // Рендер модификатора уникальной способности
   const renderUnitAbilityButton = () => {
     if (!hasUnitAbility || !unitAbilityId) {
-      // Рендерим скрытые placeholder-кнопки
       return (
         <>
-          <div className={styles.modifier} style={{ visibility: 'hidden' }} />
-          <div className={styles.modifier} style={{ visibility: 'hidden' }} />
           <div className={styles.modifier} style={{ visibility: 'hidden' }} />
         </>
       );
@@ -362,8 +361,6 @@ const Units: React.FC<UnitsProps> = ({
           aria-label={customTooltip}
           type="button"
         />
-        <div className={styles.modifier} style={{ visibility: 'hidden' }} />
-        <div className={styles.modifier} style={{ visibility: 'hidden' }} />
       </>
     );
   };
@@ -516,7 +513,24 @@ const Units: React.FC<UnitsProps> = ({
         <div className={styles.inputRow}>
           <div className={styles.modifiersColumn}>
             {renderUnitAbilityButton()}
+            <ModifierButton
+              key="cold-steel"
+              modifierId="cold-steel"
+              isActive={unitState.modifiers.includes('cold-steel')}
+              onClick={() => handleModifierToggle('cold-steel')}
+              language={language}
+            />
+            
+            {/* Третья кнопка: fiery-wrath */}
+            <ModifierButton
+              key="fiery-wrath"
+              modifierId="fiery-wrath"
+              isActive={unitState.modifiers.includes('fiery-wrath')}
+              onClick={() => handleModifierToggle('fiery-wrath')}
+              language={language}
+            />
           </div>
+          
           {renderModifierGroup(['defense', 'range-penalty', 'big-shield'])}
           {renderModifierGroup(['bloody-claw', 'ring-of-life1', 'ring-of-life2'])}
         </div>

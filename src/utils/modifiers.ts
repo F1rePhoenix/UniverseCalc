@@ -46,7 +46,7 @@ export const preservedModifiers: ModifierKey[] = [
   'basic-defense', 'advanced-defense', 'expert-defense',
   'shooting', 'retribution', 'evasion', 'fog-veil', 'hold-ground',
   'bloody-claw', 'ring-of-life1', 'ring-of-life2', 
-  'frenzy', 'home-road', 'vitality', 'forest-rage'
+  'frenzy', 'home-road', 'vitality', 'forest-rage', 'cold-steel', 'fiery-wrath'
 ];
 
 // Модификаторы, связанные с уникальными способностями и специфичные для юнита
@@ -79,6 +79,8 @@ export const modifierConfigs: Record<ModifierKey, ModifierConfig> = {
   'fog-veil': { id: 'fog-veil', isPreserved: true },
   'range-penalty': { id: 'range-penalty', isUnitSpecific: true },
   'home-road': { id: 'home-road', isPreserved: true },
+  'cold-steel': { id: 'cold-steel', isPreserved: true, isUnitSpecific: false },
+  'fiery-wrath': { id: 'fiery-wrath', isPreserved: true, isUnitSpecific: false },
   
   // Артефакты
   'bloody-claw': { id: 'bloody-claw', isPreserved: true },

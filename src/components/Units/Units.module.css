@@ -171,27 +171,4 @@
   border: 2px solid #F3A316;
 }
 
-/* Стили для иконок модификаторов */
-.basic-offense { background-image: url('../../assets/images/basicOffense.png'); }
-.advanced-offense { background-image: url('../../assets/images/advancedOffense.png'); }
-.expert-offense { background-image: url('../../assets/images/expertOffense.png'); }
-.basic-defense { background-image: url('../../assets/images/basicDefense.png'); }
-.advanced-defense { background-image: url('../../assets/images/advancedDefense.png'); }
-.expert-defense { background-image: url('../../assets/images/expertDefense.png'); }
-.frenzy { background-image: url('../../assets/images/frenzy.png'); }
-.shooting { background-image: url('../../assets/images/archery.png'); }
-.retribution { background-image: url('../../assets/images/retribution.png'); }
-.vitality { background-image: url('../../assets/images/vitality.png'); }
-.evasion { background-image: url('../../assets/images/evasion.png'); }
-.defense { background-image: url('../../assets/images/defense.png'); }
-.hold-ground { background-image: url('../../assets/images/holdGround.png'); }
-.forest-rage { background-image: url('../../assets/images/forestRage.png'); }
-.fog-veil { background-image: url('../../assets/images/fogVeil.png'); }
-.range-penalty { background-image: url('../../assets/images/straight_arrow.png'); }
-.range-penalty.active { background-image: url('../../assets/images/broken_arrow.png'); }
-.home-road { background-image: url('../../assets/images/roadHome.png'); }
-.bloody-claw { background-image: url('../../assets/images/bloodyClaw.png'); }
-.ring-of-life1 { background-image: url('../../assets/images/RingofLife.png'); }
-.ring-of-life2 { background-image: url('../../assets/images/RingofLife.png'); }
-.big-shield { background-image: url('../../assets/images/bigShield.png'); }
 .unit-ability { background-image: url('../../assets/images/ability.png'); }

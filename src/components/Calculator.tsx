@@ -29,6 +29,8 @@ interface DamageModifiers {
   neutralCurvedFire: number;
   bigShield: number;
   neutralBigShield: number;
+  coldStell: number;
+  fieryWrath: number;
 }
 
 const Calculator: React.FC = () => {
@@ -170,7 +172,9 @@ const Calculator: React.FC = () => {
       neutralBlowHeaven: 1,
       neutralCurvedFire: 1,
       bigShield: 1,
-      neutralBigShield: 1
+      neutralBigShield: 1,
+      coldStell: 1,
+      fieryWrath: 1
     };
 
     // Применяем модификаторы из вашего юнита
@@ -219,6 +223,12 @@ const Calculator: React.FC = () => {
           break;
         case 'big-shield':
           damageModifiers.bigShield = 0.5;
+          break;
+        case 'cold-steel':
+          damageModifiers.coldStell = 1.15;
+          break;
+        case 'fiery-wrath':
+          damageModifiers.fieryWrath = 1.15;
           break;
       }
     });
@@ -270,7 +280,9 @@ const Calculator: React.FC = () => {
       (yourData.hiddenModifiers.doubleShoot || 1) * 
       (yourData.hiddenModifiers.rangePenalty2 || 1) * 
       damageModifiers.curvedFire * 
-      damageModifiers.neutralBigShield;
+      damageModifiers.neutralBigShield *
+      damageModifiers.coldStell *
+      damageModifiers.fieryWrath;
     
     const yourMeleeModifiers = 
       damageModifiers.basicOffense * 
@@ -279,7 +291,9 @@ const Calculator: React.FC = () => {
       damageModifiers.retribution * 
       (yourData.hiddenModifiers.meleePenalty || 1) * 
       (yourData.hiddenModifiers.blowStorm || 1) * 
-      damageModifiers.blowHeaven;
+      damageModifiers.blowHeaven * 
+      damageModifiers.coldStell *
+      damageModifiers.fieryWrath;
     
     const neutralRangedModifiers = 
       damageModifiers.neutralRangePenalty * 

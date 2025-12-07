@@ -167,6 +167,14 @@
     background-image: url('../../assets/images/ability.png');
 }
 
+.cold-steel {
+    background-image: url('../../assets/images/coldSteel.png');
+}
+
+.fiery-wrath {
+    background-image: url('../../assets/images/fieryWrath.png');
+}
+
 /* Для скрытых/placeholder кнопок */
 .placeholder {
     visibility: hidden;

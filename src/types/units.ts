@@ -76,7 +76,7 @@ export type ModifierKey =
   | 'range-penalty' | 'home-road' | 'bloody-claw'
   | 'ring-of-life1' | 'ring-of-life2' | 'big-shield'
   | 'forest-rage-ent' | 'blow-heaven' | 'curved-fire'
-  | 'defensive-position';
+  | 'defensive-position' | 'cold-steel' | 'fiery-wrath';
 
 // Типы для функций модификаторов
 export type ModifierFunction = (isActive: boolean, state: UnitState, context?: any) => StatChanges;
